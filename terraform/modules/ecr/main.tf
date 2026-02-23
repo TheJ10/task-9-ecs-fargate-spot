@@ -1,5 +1,5 @@
 resource "aws_ecr_repository" "strapi" {
-  name = "jaspal-task8-strapi"
+  name = "jaspal-task9-strapi"
 
   image_scanning_configuration {
     scan_on_push = true

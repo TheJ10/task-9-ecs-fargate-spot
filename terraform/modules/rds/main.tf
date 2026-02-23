@@ -9,13 +9,13 @@ data "aws_subnets" "default" {
   }
 }
 
-resource "aws_db_subnet_group" "jaspal_task8_db_subnet_group" {
-  name       = "jaspal-task8-db-subnet-group"
+resource "aws_db_subnet_group" "jaspal_task9_db_subnet_group" {
+  name       = "jaspal-task9-db-subnet-group"
   subnet_ids = data.aws_subnets.default.ids
 }
 
-resource "aws_db_instance" "jaspal_task8_db" {
-  identifier              = "jaspal-task8-strapi-db"
+resource "aws_db_instance" "jaspal_task9_db" {
+  identifier              = "jaspal-task9-strapi-db"
   engine                  = "postgres"
   engine_version          = "15"
   instance_class          = "db.t3.small"
@@ -29,5 +29,5 @@ resource "aws_db_instance" "jaspal_task8_db" {
   skip_final_snapshot     = true
   deletion_protection     = false
 
-  db_subnet_group_name    = aws_db_subnet_group.jaspal_task8_db_subnet_group.name
+  db_subnet_group_name    = aws_db_subnet_group.jaspal_task9_db_subnet_group.name
 }

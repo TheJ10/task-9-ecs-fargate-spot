@@ -9,12 +9,12 @@ data "aws_subnets" "default" {
   }
 }
 
-resource "aws_ecs_cluster" "jaspal_task8_cluster" {
-  name = "jaspal-task8-strapi-cluster"
+resource "aws_ecs_cluster" "jaspal_task9_cluster" {
+  name = "jaspal-task9-strapi-cluster"
 }
 
-resource "aws_ecs_task_definition" "jaspal_task8_task" {
-  family                   = "jaspal-task8-strapi-task"
+resource "aws_ecs_task_definition" "jaspal_task9_task" {
+  family                   = "jaspal-task9-strapi-task"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = "512"
@@ -23,7 +23,7 @@ resource "aws_ecs_task_definition" "jaspal_task8_task" {
 
   container_definitions = jsonencode([
     {
-      name  = "jaspal-task8-strapi-container"
+      name  = "jaspal-task9-strapi-container"
       image = "${var.ecr_repository_url}:${var.image_tag}"
 
       portMappings = [
@@ -55,25 +55,19 @@ resource "aws_ecs_task_definition" "jaspal_task8_task" {
         { name = "ENCRYPTION_KEY", value = "encryption_key_1234567890" }
 
       ]
-
-      logConfiguration = {
-        logDriver = "awslogs"
-        options = {
-          awslogs-group         = var.log_group_name
-          awslogs-region        = var.aws_region
-          awslogs-stream-prefix = "ecs/jaspal-task8-strapi"
-        }
-      }
     }
   ])
 }
 
-resource "aws_ecs_service" "jaspal_task8_service" {
-  name            = "jaspal-task8-strapi-service"
-  cluster         = aws_ecs_cluster.jaspal_task8_cluster.id
-  task_definition = aws_ecs_task_definition.jaspal_task8_task.arn
-  desired_count   = 1
-  launch_type     = "FARGATE"
+resource "aws_ecs_service" "jaspal_task9_service" {
+  name            = "jaspal-task9-strapi-service"
+  cluster         = aws_ecs_cluster.jaspal_task9_cluster.id
+  task_definition = aws_ecs_task_definition.jaspal_task9_task.arn
+  desired_count   = 1  
+  capacity_provider_strategy {
+    capacity_provider = "FARGATE_SPOT"
+    weight            = 1
+  }
 
   network_configuration {
     subnets          = data.aws_subnets.default.ids

@@ -6,6 +6,6 @@ subnet_ids = [
   "subnet-08965304a1bc70ce8"
 ]
 
-db_name     = "jaspal_task8_strapi"
-db_username = "jaspal_task8_user"
-db_password = "Jaspaltask8"
+db_name     = "jaspal_task9_strapi"
+db_username = "jaspal_task9_user"
+db_password = "Jaspaltask9"
