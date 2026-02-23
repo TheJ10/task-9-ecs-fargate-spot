@@ -1,43 +1,30 @@
-# Task-8: Deploy Strapi on AWS ECS Fargate using Terraform & GitHub Actions
+# Task-9: Strapi Deployment on AWS ECS using Fargate Spot (Terraform + CI/CD)
 
 ## Project Overview
-This project demonstrates deploying a **Strapi headless CMS** on **AWS ECS Fargate** using **Terraform (Infrastructure as Code)** and **GitHub Actions for CI/CD**.  
-The application image is built and pushed to **Amazon ECR**, and the runtime environment is monitored using **Amazon CloudWatch**.
+This project demonstrates deploying a Strapi application on AWS ECS using Fargate Spot, fully managed through Terraform and automated with GitHub Actions.
 
----
-
-## Objectives of Task-8
-- Containerize a Strapi application using Docker
-- Automate Docker image build and push to **Amazon ECR**
-- Provision AWS infrastructure using **Terraform (modular approach)**
-- Deploy Strapi on **ECS Fargate**
-- Configure **RDS PostgreSQL** as the backend database
-- Enable **CloudWatch logging and ECS metrics**
-- Troubleshoot and resolve real-world deployment issues
+This is an upgrade from the previous deployment where standard Fargate was used. In this version, the ECS service is configured with a capacity provider strategy using FARGATE_SPOT to optimize compute cost while maintaining a serverless architecture.
 
 ---
 
 ## Architecture Overview
 ```text
-GitHub Push
-   ↓
-GitHub Actions (CI)
-   ↓
-Docker Image Build
-   ↓
-Amazon ECR
-   ↓
-Terraform Apply
-   ↓
-AWS ECS Fargate
-   ↓
-Strapi Application
-   ↓
-Amazon RDS (PostgreSQL)
-   ↓
-CloudWatch Logs & Metrics
+      GitHub Push
+         ↓
+   GitHub Actions (CI)
+         ↓
+   Docker Image Build
+         ↓
+      Amazon ECR
+         ↓
+   GitHub Actions (CD)
+         ↓
+   Terraform Apply
+         ↓
+ECS Cluster (Fargate Spot)
+         ↓
+Strapi Application Running
 ```
-
 
 ---
 
@@ -46,101 +33,92 @@ CloudWatch Logs & Metrics
 - **Docker**
 - **Terraform** (Modular IaC)
 - **GitHub Actions** (CI/CD)
-- **Amazon ECS (Fargate)**
+- **Amazon ECS**
 - **Amazon ECR**
 - **Amazon RDS (PostgreSQL)**
-- **Amazon CloudWatch**
 - **AWS VPC & Security Groups**
+- **AWS Fargate Spot**
+
+---
+
+## Infrastructure Provisioned via Terraform
+- ECS Cluster
+- ECS Task Definition
+- ECS Service (Fargate Spot Capacity Provider)
+- Amazon ECR Repository
+- Amazon RDS PostgreSQL Instance
+- DB Subnet Group
+- Networking (Default VPC & Subnets)
+Infrastructure is organized using a modular Terraform structure for better maintainability.
+
+---
+
+## CI/CD Workflow
+### CI Pipeline
+- Builds Docker image
+- Pushes image to Amazon ECR
+- Generates image tag
+
+### CD Pipeline
+- Runs Terraform
+- Updates ECS Task Definition with new image tag
+- Deploys updated service automatically
+
+---
+
+## Key Upgrade in Task-9
+- Replaced standard Fargate with Fargate Spot
+- Configured ECS Service using capacity provider strategy
+- Achieved cost optimization without changing application architecture
+- Maintained fully automated CI/CD pipeline
+
+---
+
+## Application Access
+The Strapi admin panel runs on ECS Fargate Spot and is accessible via the public IP assigned to the task.
+
+### Example:
+```bash
+http://<public-ip>:1337/admin
+```
 
 ---
 
 ## Repository Structure
 ```text
 .
-├── strapi/ # Strapi application source
-│ ├── Dockerfile
-│ ├── package.json
-│ └── config/
+├── strapi/
+│   ├── Dockerfile
+│   ├── package.json
+│   └── config/
 │
 ├── terraform/
-│ ├── main.tf
-│ ├── variables.tf
-│ ├── backend.tf
-│ ├── providers.tf
-│ └── modules/
-│ ├── ecs/
-│ ├── rds/
-│ ├── ecr/
-│ └── cloudwatch/
-│
-├── screenshots/
+│   ├── main.tf
+│   ├── variables.tf
+│   ├── backend.tf
+│   └── modules/
+│       ├── ecs/
+│       ├── rds/
+│       └── ecr/
 │
 └── .github/
-└── workflows/
-└── ci.yml
+    └── workflows/
+        ├── ci.yml
+        └── deploy.yml
 ```
 
 ---
 
-## CI/CD Workflow (GitHub Actions)
-
-### CI Pipeline
-- Triggers on push
-- Builds Docker image for Strapi
-- Authenticates with AWS
-- Pushes image to **Amazon ECR** with commit SHA tag
-
-### CD (Terraform)
-- Infrastructure provisioned using Terraform
-- ECS service pulls the latest image from ECR
-- Task redeploys automatically
-
----
-
-## Infrastructure Provisioned via Terraform
-- ECS Cluster & Service (Fargate)
-- ECS Task Definition
-- Amazon ECR Repository
-- Amazon RDS PostgreSQL Instance
-- CloudWatch Log Group
-- Networking via default VPC (auto-discovered subnets)
-
-Terraform was implemented using a **modular structure** for maintainability and clarity.
-
----
-
-## Monitoring & Observability
-- **CloudWatch Logs** configured using `awslogs` driver
-- ECS Metrics monitored:
-  - CPU Utilization
-  - Memory Utilization
-  - Task Count
-  - Network In / Network Out
-
----
-
-## Runtime Issues & Real-World Fixes
-During deployment, several real-world issues were encountered and resolved:
-
-- Image tag mismatch (`latest` vs commit SHA)
-- Missing Strapi production secrets
-- PostgreSQL SSL enforcement by AWS RDS
-- TLS certificate validation failures
-- ECS networking and security group restrictions
-
-All issues were fixed by properly configuring:
-- ECS task environment variables
-- PostgreSQL SSL settings
-- Node.js TLS behavior
-- Security group inbound rules
-
----
-
 ## Final Result
-- Strapi application successfully running on ECS Fargate
+- Strapi application successfully running on ECS Fargate spot
 - Admin panel accessible via ECS task public IP
 - Logs and metrics visible in CloudWatch
 - CI/CD pipeline functioning end-to-end
+
+---
+
+## Loom Video
+Link: https://www.loom.com/share/db64b5cac7344da0a90ca1f6ed1dd9b2
 
 ---
 
